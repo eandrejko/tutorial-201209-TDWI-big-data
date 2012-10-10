@@ -6,7 +6,11 @@
 # from https://github.com/RevolutionAnalytics/RHadoop/wiki/Tutorial
 #
 
-library(rmr)
+library(rmr2)
+
+Sys.setenv(HADOOP_HOME="/usr/lib/hadoop-0.20-mapreduce/")
+Sys.setenv(CLASSPATH="/usr/lib/hadoop-0.20-mapreduce/")
+Sys.setenv(HADOOP_LIBEXEC_DIR="/usr/lib/hadoop/libexec")
 
 # Set "LOCAL" variable to T to execute using rmr's local backend.
 # Otherwise, use Hadoop (which needs to be running, correctly configured, etc.)
@@ -14,16 +18,16 @@ library(rmr)
 LOCAL=F
 
 if (LOCAL) {
-	rmr.options.set(backend = 'local')
+  rmr.options(backend = 'local')
 } else {
-	rmr.options.set(backend = 'hadoop')
+  rmr.options(backend = 'hadoop')
 }
 
-small.ints = 1:1000
+small.ints = 1:1000000
 
 small.int.path = to.dfs(small.ints)
 out = mapreduce(input = small.int.path, map = function(k,v) keyval(v, v^2))
 
-df = as.data.frame( from.dfs( out, structured=TRUE) )
+df = as.data.frame( from.dfs( out()) )
 colnames(df) = c('n', 'n2')
 str(df)
